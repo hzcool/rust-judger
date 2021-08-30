@@ -1,7 +1,14 @@
 use std::collections::HashMap;
+use lazy_static::lazy_static;
+use std::path::PathBuf;
 
 pub type CompileConfigMap = HashMap<&'static str, CompileConfig>;
 pub type SpjCompileConfigMap = HashMap<&'static str, SpjCompileConfig>;
+
+lazy_static! {
+    pub static ref BASE_PATH: PathBuf = PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!"));
+    pub static ref RUNNER_PATH: PathBuf = PathBuf::from(std::env::var("BASE_PATH").unwrap()).join("src/cpp_runner/runner");
+}
 
 use crate::checker::checker::Checker;
 use serde::{Deserialize, Serialize};
@@ -115,7 +122,7 @@ const PYTHON2: CompileConfig = CompileConfig {
 };
 const PYTHON3: CompileConfig = CompileConfig {
     src_name: "solution.py",
-    exe_name: "__pycache__/solution.cpython-37.pyc",
+    exe_name: "__pycache__/solution.cpython-38.pyc",
     compile_command: "/usr/bin/python3 -m py_compile {src_path}",
     run_command: "/usr/bin/python3 {exe_path}",
     seccomp_rule: "general",
@@ -149,10 +156,19 @@ pub fn make_compile_config_map() -> CompileConfigMap {
 
 pub fn make_spj_compile_config_map() -> SpjCompileConfigMap {
     let mut mp: SpjCompileConfigMap = HashMap::new();
+    mp.insert("C", SPJ_C);
     mp.insert("C++", SPJ_CPP);
     mp.insert("Python", SPJ_PYTHON);
     mp
 }
+
+const SPJ_C: SpjCompileConfig = SpjCompileConfig {
+    src_name: "spj_main.c",
+    exe_name: "spj_main",
+    compile_command: "/usr/bin/gcc -std=c11 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
+    run_command: "{spj_exe_path}",
+    //每个特判指令对每个样例需要接三个参数 -i {input_path} -o {output_path} -p {process_output_path}
+};
 
 const SPJ_CPP: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_main.cpp",
@@ -164,7 +180,7 @@ const SPJ_CPP: SpjCompileConfig = SpjCompileConfig {
 
 const SPJ_PYTHON: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_solution.py",
-    exe_name: "__pycache__/spj_solution.cpython-37.pyc",
+    exe_name: "__pycache__/spj_solution.cpython-38.pyc",
     compile_command: "/usr/bin/python3 -m py_compile {spj_src_path}",
     run_command: "/usr/bin/python3 {spj_exe_path}",
     //每个特判指令对每个样例需要接三个参数 -i {input_path}  -o {output_path} -p {process_output_path}

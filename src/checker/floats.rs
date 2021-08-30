@@ -75,6 +75,7 @@ pub fn check(
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::check;
 

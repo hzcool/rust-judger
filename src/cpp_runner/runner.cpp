@@ -144,3 +144,5 @@ void Runner::child_process() {
     execve(argv[0], argv, envp);
     exit(RUN_COMMAND_FAIL);
 }
+
+// ./runner2 -c "a.out" -I /test_case/normal_problem/1.in -O ./fuck.out -r c_cpp

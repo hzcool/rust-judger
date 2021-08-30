@@ -1,13 +1,13 @@
 1. 编译选项
-[C , C++(默认C++11) , C++14 , C++17 , Python2 , Python3 , Java]
+[C , C++(默认C++11) , C++14 , C++17, Python2 , Python3 , Java]
 
 2. 编译器版本
-C : gcc8.3.0
+C : gcc11.1.0,
 
-C++ : g++8.3.0
+C++ : g++11.1.0,
 
-Python2 : Python2.7.16
+Python2 : Python2.7.18
 
-Python3 : Python3.7.3
+Python3 : Python3.8.10
 
 Java : Java16.0.2

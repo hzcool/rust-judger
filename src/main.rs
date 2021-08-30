@@ -44,7 +44,7 @@ async fn judge(
     };
 
     let temp_dir = tempfile::tempdir()
-        .map_err(|err| system_error_response(format!("新建临时文件夹错误， 错误新信息 : {}", err)))?;
+        .map_err(|err| system_error_response(format!("新建临时文件夹错误 : {}", err)))?;
     let exe_dir = temp_dir.path().to_path_buf();
     // let exe_dir = std::path::PathBuf::from("/home/hzcool/Code/Rust/rust-judger/src/tmp");
     let src_path = exe_dir.join(compile_config.src_name);
@@ -63,7 +63,7 @@ async fn judge(
 
     // 编译
     let compile_info = match utils::run_cmd(compile_cmd.as_str()) {
-        Err(err) => return Err(system_error_response(format!("{}", err))),
+        Err(err) => return Err(system_error_response(format!("编译时出错 : {}", err))),
         Ok(output) => match output.stderr.is_empty() {
             false => {
                 return Err(compile_error_response(format!(
@@ -112,7 +112,7 @@ async fn judge(
             Ok(output) => {
                 if !output.stderr.is_empty() {
                     return Err(compile_error_response(format!(
-                        "编译特判文件失败, 错误信息 : {}",
+                        "编译特判文件失败 : {}",
                         String::from_utf8(output.stderr).unwrap()
                     )));
                 }
@@ -154,13 +154,14 @@ async fn judge(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv::dotenv().expect("Failed to read .env file");
-
+    // dotenv::dotenv().expect("Failed to read .env file");
     let app_data = Data::new(AppData {
         access_token: std::env::var("ACCESS_TOKEN").expect("can't get find ACCESS_TOKEN !!!"),
-        ping_info: utils::read_file("src/ping.txt").unwrap(),
+        ping_info: utils::read_file(types::config::BASE_PATH.join("src/ping.txt").to_str().unwrap())?,
     });
-    HttpServer::new(move || {
+    let addr = std::env::var("ADDR").expect("can't find ADDR !!!");
+
+    let server = HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
             .app_data(Data::new(types::config::make_compile_config_map()))
@@ -183,9 +184,10 @@ async fn main() -> std::io::Result<()> {
                     .service(judge),
             )
     })
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
+        .bind(addr.as_str())?
+        .run();
+    println!("服务器已启动 , addr : {}", addr);
+    server.await
 }
 
 #[cfg(test)]

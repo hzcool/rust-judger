@@ -41,8 +41,10 @@ pub fn check(std_output_path: &str, process_output_path: &str) -> CheckResult {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::check;
+
     #[test]
     fn test_check() {
         let std_path = "/home/hzcool/Code/Rust/rust-judger/src/1.txt";

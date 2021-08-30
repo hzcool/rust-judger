@@ -1,18 +1,13 @@
 use crate::types::config::{JudgeConfig, TestCase};
 use crate::types::response::Response;
 use crate::types::result::{JudgeResult, JudgeStatus, SpjJudgeResult};
-use lazy_static::lazy_static;
+
 use std::path::PathBuf;
 use std::sync::{mpsc, Arc};
 
-lazy_static! {
-    pub static ref BASE_PATH : PathBuf = PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!"));
-    pub static ref RUNNER_PATH: PathBuf = PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!")).join("src/cpp_runner/runner");
-}
-
 
 fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeResult {
-    let program = RUNNER_PATH.to_str().unwrap();
+    let program = crate::types::config::RUNNER_PATH.to_str().unwrap();
     let io_dir_path = PathBuf::from(config.io_dir.as_str());
     let input_path = io_dir_path.join(test_case.input_name.as_str());
     let output_path = io_dir_path.join(test_case.output_name.as_str());

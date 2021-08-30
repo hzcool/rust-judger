@@ -39,7 +39,7 @@
       mode : 模式  #当 typ 为 "floats" 时起作用， 值可选 0 (绝对误差)或 1 (相对)，可空，默认为 0
       epsilon : 误差范围 #当 typ 为 "floats" 时起作用， 可空，默认为 1e-9
   spj_config : 特判配置 # json 格式, 可空。 非空时 checker 不起作用
-      spj_lang : 特判文件语言 #可选项["C++"(默认C++11), "Python(默认Python3)"]
+      spj_lang : 特判文件语言 #可选项["C"(默认C11), "C++"(默认C++17), "Python(默认Python3)"]
       spj_src : 特判代码  
       seccomp_rule : 代码系统调用权限控制 #可选项["c_cpp", "general", "none"]。 建议为空, 由测评机根据语言决定
    ```
@@ -82,7 +82,24 @@
   }
    ```
 
-  
+***
 
+### 3. checker 说明
 
-  
+1. type 可选项为 ["standard", "ignore_whitespaces",  "identical", "floats", "unordered"]，默认为 standard。
+
+```yaml
+standard: 忽略空行和末尾空白字符
+ignore_whitespaces: 忽略所有的空白字符
+identical: 忽略行末的空白字符
+floats: 浮点比较， mode = 0(默认)为绝对误差， mode = 1为相对误差。  误差上限为 episilon(默认为1e-9)。 对于比较文件的数字部分会采用对应的误差，非数字部分会进行一致性比较。
+unordered: 将测试代码输出文件的所有单词升序排列后然后与标准文件(同样升序)进行一致性比较。
+```
+
+2. 对于 special-judge, 该项不起作用。
+
+***
+
+### 4. spj_config 说明
+
+1. json 中该项不为空时采用特判。 特判文件语言可选项["C"(默认C11), "C++"(默认C++17), "Python(默认Python3)"]

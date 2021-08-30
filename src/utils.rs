@@ -21,8 +21,10 @@ pub fn run_cmd(cmd: &str) -> std::io::Result<process::Output> {
     process::Command::new("sh").arg("-c").arg(cmd).output()
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_read_file() {
         let x = read_file("/home/hzcool/Code/Rust/rust-judger/src/1.txt").unwrap();

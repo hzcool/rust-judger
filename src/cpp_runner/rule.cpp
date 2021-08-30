@@ -17,7 +17,8 @@ bool c_cpp_seccomp_rules_init(char* exe_path) {
                                 SCMP_SYS(close), SCMP_SYS(readlink),
                                 SCMP_SYS(sysinfo), SCMP_SYS(write),
                                 SCMP_SYS(writev), SCMP_SYS(lseek),
-                                SCMP_SYS(clock_gettime)};
+                                SCMP_SYS(clock_gettime), SCMP_SYS(pread64),
+                                };
 
     int syscalls_whitelist_length = sizeof(syscalls_whitelist) / sizeof(int);
     scmp_filter_ctx ctx = NULL;
@@ -31,10 +32,10 @@ bool c_cpp_seccomp_rules_init(char* exe_path) {
             return false;
         }
     }
-    // add extra rule for execve
-    if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(execve), 0, SCMP_A0(SCMP_CMP_EQ, (scmp_datum_t)exe_path)) != 0) {
-        return false;
-    }
+//     add extra rule for execve
+     if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(execve), 0, SCMP_A0(SCMP_CMP_EQ, (scmp_datum_t)exe_path)) != 0) {
+         return false;
+     }
     
     // do not allow "w" and "rw"
     if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(open), 1, SCMP_CMP(1, SCMP_CMP_MASKED_EQ, O_WRONLY | O_RDWR, 0)) != 0) {

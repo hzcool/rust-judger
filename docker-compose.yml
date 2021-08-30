@@ -1,0 +1,14 @@
+version: '3'
+services:
+  judger-server:
+    image: hzcool/ubuntu-judger:v0
+    restart: always
+    container_name: judge-server
+    environment:
+      - ACCESS_TOKEN=123456
+      - ADDR=0.0.0.0:7777
+    volumes:
+      - /home/hzcool/test_case:/test_case            #定义容器可访问测试用例文件夹 ，请求时的io_dir以容器内路径为准
+    privileged: true
+    ports:
+      - "7777:7777"
