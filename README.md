@@ -2,7 +2,13 @@
 
 ***
 
-### 1.安装
+### 1.快速搭建
+
++ 先下载docker和docker-compose， 版本不要太旧即可，可自行尝试安装
++ git clone 该项目到你的某个文件夹内(实际上只要有```docker-compose.yml``` 单个文件即可实现安装)
++ 进入到 ```docker-compose.yml``` 所在目录 ，输入启动命令```docker-compose up -d```即可成功运行。
++ 测试运行，输入 ```curl -H "Content-Type:application/json" -H "ACCESS_TOKEN:123456" -X POST http://0.0.0.0:7777/ping```,
+  返回语言的配置信息说明启动成功。
 
 ***
 
@@ -14,7 +20,23 @@
   head ```"content-type", "application/json"```  
   data: ```空```
 
-返回结果: 待定
+返回结果:
+
+```yaml
+1. 编译选项: [ C , C++(默认C++11) , C++14 , C++17, Python2 , Python3 , Java ]
+
+2. 编译器版本:
+  C: gcc11.1.0,
+
+  C++: g++11.1.0,
+
+  Python2: Python2.7.18
+
+  Python3: Python3.8.10
+
+  Java: Java16.0.2
+```
+
 ***
 
 + judge  
