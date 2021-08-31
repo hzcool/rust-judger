@@ -60,5 +60,3 @@ pub fn bad_request_response(info: String) -> Response {
     res.status = JudgeStatus::BadRequst;
     res
 }
-
-

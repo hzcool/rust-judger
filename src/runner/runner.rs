@@ -5,7 +5,6 @@ use crate::types::result::{JudgeResult, JudgeStatus, SpjJudgeResult};
 use std::path::PathBuf;
 use std::sync::{mpsc, Arc};
 
-
 fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeResult {
     let program = crate::types::config::RUNNER_PATH.to_str().unwrap();
     let io_dir_path = PathBuf::from(config.io_dir.as_str());
@@ -30,12 +29,8 @@ fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeRes
         format!("{}", config.resource_rule.unwrap_or(7 as i8)),
     ];
 
-
     let args = _args.iter().map(|x| x.as_str()).collect::<Vec<&str>>();
-    match std::process::Command::new(program)
-        .args(args)
-        .output()
-    {
+    match std::process::Command::new(program).args(args).output() {
         Err(err) => JudgeResult::from_system_err(Some(test_case.id), err.to_string()),
         Ok(output) => {
             let _res = String::from_utf8(output.stdout).unwrap();
@@ -45,41 +40,67 @@ fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeRes
                     if let JudgeStatus::Accepted = res.status {
                         //特判
                         if let Some(spj_config) = &config.spj_config {
-                            let args_vec: Vec<&str> = spj_config.run_command.as_ref().unwrap().as_str().split_whitespace().map(|x| x).collect();
-                            let args: &[&str] = &[args_vec.as_slice(), &[
-                                "-i",
-                                input_path.to_str().unwrap(),
-                                "-o",
-                                output_path.to_str().unwrap(),
-                                "-p",
-                                test_case.process_output_path.as_ref().unwrap().as_str(),
-                            ]].concat();
-                            match std::process::Command::new(args[0]).args(&args[1..]).output() {
+                            let args_vec: Vec<&str> = spj_config
+                                .run_command
+                                .as_ref()
+                                .unwrap()
+                                .as_str()
+                                .split_whitespace()
+                                .map(|x| x)
+                                .collect();
+                            let args: &[&str] = &[
+                                args_vec.as_slice(),
+                                &[
+                                    "-i",
+                                    input_path.to_str().unwrap(),
+                                    "-o",
+                                    output_path.to_str().unwrap(),
+                                    "-p",
+                                    test_case.process_output_path.as_ref().unwrap().as_str(),
+                                ],
+                            ]
+                            .concat();
+                            match std::process::Command::new(args[0])
+                                .args(&args[1..])
+                                .output()
+                            {
                                 Err(err) => {
                                     res.status = JudgeStatus::SystemError;
-                                    res.info = format!("运行特判文件出错, 错误信息 : {}", err.to_string())
+                                    res.info =
+                                        format!("运行特判文件出错, 错误信息 : {}", err.to_string())
                                 }
                                 Ok(output) => {
                                     if !output.stderr.is_empty() {
                                         res.status = JudgeStatus::SystemError;
-                                        res.info = format!("运行特判文件出错, 错误信息 : {}", String::from_utf8(output.stderr).unwrap());
+                                        res.info = format!(
+                                            "运行特判文件出错, 错误信息 : {}",
+                                            String::from_utf8(output.stderr).unwrap()
+                                        );
                                     } else {
                                         let _spj_res = String::from_utf8(output.stdout).unwrap();
-                                        match serde_json::from_str::<SpjJudgeResult>(_spj_res.as_str()) {
+                                        match serde_json::from_str::<SpjJudgeResult>(
+                                            _spj_res.as_str(),
+                                        ) {
                                             Ok(spj_res) => {
                                                 res.status = spj_res.status;
                                                 res.info = spj_res.info;
                                             }
                                             Err(err2) => {
                                                 res.status = JudgeStatus::SystemError;
-                                                res.info = format!("特判信息的输出结果解析失败, 错误信息: {}", err2.to_string());
+                                                res.info = format!(
+                                                    "特判信息的输出结果解析失败, 错误信息: {}",
+                                                    err2.to_string()
+                                                );
                                             }
                                         }
                                     }
                                 }
                             }
                         } else {
-                            let check_result = config.checker.as_ref().unwrap().check(output_path.to_str().unwrap(), test_case.process_output_path.as_ref().unwrap().as_str());
+                            let check_result = config.checker.as_ref().unwrap().check(
+                                output_path.to_str().unwrap(),
+                                test_case.process_output_path.as_ref().unwrap().as_str(),
+                            );
                             res.status = check_result.0;
                             res.info = check_result.1;
                         }
@@ -112,9 +133,9 @@ pub fn run(config: JudgeConfig) -> Result<Response, Response> {
     }
 
     // 总和答案,
-    response.results.sort_unstable_by(|x, y| {
-        x.id.unwrap_or(-1).cmp(&y.id.unwrap_or(-1))
-    });
+    response
+        .results
+        .sort_unstable_by(|x, y| x.id.unwrap_or(-1).cmp(&y.id.unwrap_or(-1)));
 
     for item in &response.results {
         if item.status.get_i32() > response.status.get_i32() {

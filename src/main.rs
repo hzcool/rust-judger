@@ -15,7 +15,6 @@ use types::response::{
     bad_request_response, compile_error_response, system_error_response, Response,
 };
 
-
 struct AppData {
     access_token: String,
     ping_info: String,
@@ -77,23 +76,29 @@ async fn judge(
 
     //构造运行指令
     let run_cmd = String::from(compile_config.run_command);
-    run_config.run_command = Some(
-        match run_config.lang.as_str() {
-            "Java" => run_cmd
-                .replace("{exe_dir}", exe_dir.to_str().unwrap())
-                .replace("{max_memory}", format!("{}", run_config.max_memory / 1024).as_str()),
-            _ => run_cmd.replace("{exe_path}", exe_path.to_str().unwrap())
-        }
-    );
+    run_config.run_command = Some(match run_config.lang.as_str() {
+        "Java" => run_cmd
+            .replace("{exe_dir}", exe_dir.to_str().unwrap())
+            .replace(
+                "{max_memory}",
+                format!("{}", run_config.max_memory / 1024).as_str(),
+            ),
+        _ => run_cmd.replace("{exe_path}", exe_path.to_str().unwrap()),
+    });
 
     //special judge 编译checker代码
     if let Some(spj_config) = &mut run_config.spj_config {
-        let spj_compile_config = match spj_compile_config_map.as_ref().get(spj_config.spj_lang.as_str()) {
-            None => return Err(bad_request_response(format!(
-                "不支特特判语言 `{}` ",
-                spj_config.spj_lang,
-            ))),
-            Some(c) => c
+        let spj_compile_config = match spj_compile_config_map
+            .as_ref()
+            .get(spj_config.spj_lang.as_str())
+        {
+            None => {
+                return Err(bad_request_response(format!(
+                    "不支特特判语言 `{}` ",
+                    spj_config.spj_lang,
+                )))
+            }
+            Some(c) => c,
         };
 
         let spj_src_path = exe_dir.join(spj_compile_config.src_name);
@@ -121,11 +126,11 @@ async fn judge(
 
         // 构造spj运行指令
         spj_config.run_command = Some(
-            spj_compile_config.run_command
+            spj_compile_config
+                .run_command
                 .replace("{spj_exe_path}", spj_exe_path.to_str().unwrap()),
         )
     }
-
 
     // 代码输出文件
     for t in run_config.test_cases.iter_mut() {
@@ -145,7 +150,6 @@ async fn judge(
         run_config.checker = Some(checker::checker::Checker::default());
     }
 
-
     // run
     let mut res = runner::runner::run(run_config)?;
     res.compile_info = compile_info;
@@ -157,7 +161,12 @@ async fn main() -> std::io::Result<()> {
     // dotenv::dotenv().expect("Failed to read .env file");
     let app_data = Data::new(AppData {
         access_token: std::env::var("ACCESS_TOKEN").expect("can't get find ACCESS_TOKEN !!!"),
-        ping_info: utils::read_file(types::config::BASE_PATH.join("src/ping.txt").to_str().unwrap())?,
+        ping_info: utils::read_file(
+            types::config::BASE_PATH
+                .join("src/ping.txt")
+                .to_str()
+                .unwrap(),
+        )?,
     });
     let addr = std::env::var("ADDR").expect("can't find ADDR !!!");
 
@@ -184,8 +193,8 @@ async fn main() -> std::io::Result<()> {
                     .service(judge),
             )
     })
-        .bind(addr.as_str())?
-        .run();
+    .bind(addr.as_str())?
+    .run();
     println!("服务器已启动 , addr : {}", addr);
     server.await
 }
@@ -193,10 +202,4 @@ async fn main() -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use actix_web::test;
-
-    #[actix_rt::test]
-    async fn test_ping() {
-        let req = test::TestRequest::with_header("content-type", "application/json").to_http_request();
-    }
 }

@@ -1,13 +1,15 @@
-use std::collections::HashMap;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 pub type CompileConfigMap = HashMap<&'static str, CompileConfig>;
 pub type SpjCompileConfigMap = HashMap<&'static str, SpjCompileConfig>;
 
 lazy_static! {
-    pub static ref BASE_PATH: PathBuf = PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!"));
-    pub static ref RUNNER_PATH: PathBuf = PathBuf::from(std::env::var("BASE_PATH").unwrap()).join("src/cpp_runner/runner");
+    pub static ref BASE_PATH: PathBuf =
+        PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!"));
+    pub static ref RUNNER_PATH: PathBuf =
+        PathBuf::from(std::env::var("BASE_PATH").unwrap()).join("src/cpp_runner/runner");
 }
 
 use crate::checker::checker::Checker;
@@ -67,7 +69,7 @@ pub struct JudgeConfig {
 
     pub resource_rule: Option<i8>, // 资源限制规则
 
-    pub run_command: Option<String>,   //生成的运行规则
+    pub run_command: Option<String>, //生成的运行规则
 }
 
 // const RUN_CMD_FMT: &str = "{} -c \"{}\" -t {} -m {} -o {} -I {} -O {} -r {}";
@@ -137,7 +139,6 @@ const JAVA: CompileConfig = CompileConfig {
     resource_rule: 5,
 };
 
-
 pub fn make_compile_config_map() -> CompileConfigMap {
     let mut mp: CompileConfigMap = HashMap::new();
     mp.insert("C", C11);
@@ -165,7 +166,8 @@ pub fn make_spj_compile_config_map() -> SpjCompileConfigMap {
 const SPJ_C: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_main.c",
     exe_name: "spj_main",
-    compile_command: "/usr/bin/gcc -std=c11 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
+    compile_command:
+        "/usr/bin/gcc -std=c11 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
     run_command: "{spj_exe_path}",
     //每个特判指令对每个样例需要接三个参数 -i {input_path} -o {output_path} -p {process_output_path}
 };
@@ -173,7 +175,8 @@ const SPJ_C: SpjCompileConfig = SpjCompileConfig {
 const SPJ_CPP: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_main.cpp",
     exe_name: "spj_main",
-    compile_command: "/usr/bin/g++ -std=c++17 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
+    compile_command:
+        "/usr/bin/g++ -std=c++17 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
     run_command: "{spj_exe_path}",
     //每个特判指令对每个样例需要接三个参数 -i {input_path} -o {output_path} -p {process_output_path}
 };

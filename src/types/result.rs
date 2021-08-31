@@ -20,7 +20,7 @@ pub enum JudgeStatus {
     //6
     CompileError,
     //-1
-    BadRequst,  // 80
+    BadRequst, // 80
 }
 
 #[derive(Serialize, Deserialize2, Default, Debug)]
@@ -38,7 +38,6 @@ pub struct SpjJudgeResult {
     pub info: String,
 }
 
-
 impl JudgeResult {
     pub fn from_system_err(id: Option<i32>, info: String) -> JudgeResult {
         JudgeResult {
@@ -51,7 +50,6 @@ impl JudgeResult {
     }
 }
 
-
 impl JudgeResult {
     pub fn system_error_result(s: String) -> JudgeResult {
         JudgeResult {
@@ -63,7 +61,6 @@ impl JudgeResult {
         }
     }
 }
-
 
 impl JudgeStatus {
     pub fn from(x: i32) -> JudgeStatus {
@@ -102,8 +99,8 @@ impl Default for JudgeStatus {
 
 impl Serialize for JudgeStatus {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_i32(self.get_i32())
     }
@@ -111,8 +108,8 @@ impl Serialize for JudgeStatus {
 
 impl<'de> Deserialize<'de> for JudgeStatus {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         deserializer.deserialize_i32(I32Visitor)
     }
@@ -128,55 +125,55 @@ impl<'de> Visitor<'de> for I32Visitor {
     }
 
     fn visit_i8<E>(self, value: i8) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
     fn visit_u8<E>(self, value: u8) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
 
     fn visit_i16<E>(self, value: i16) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
     fn visit_u16<E>(self, value: u16) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
 
     fn visit_i32<E>(self, value: i32) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value))
     }
 
     fn visit_u32<E>(self, value: u32) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
 
     fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
 
     fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
-        where
-            E: de::Error,
+    where
+        E: de::Error,
     {
         Ok(JudgeStatus::from(value as i32))
     }
