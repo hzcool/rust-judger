@@ -16,7 +16,7 @@ lazy_static! {
         PathBuf::from(std::env::var("TEST_CASE_DIR").expect("缺少环境变量 : `TEST_CASE_DIR` !!!"));
     pub static ref CPU_CORES_COUNT: usize = {
         let x = std::process::Command::new("grep").args(["core id", "/proc/cpuinfo"]).output().expect("获取 CPU 核心数失败!!!");
-        std::cmp::max((String::from_utf8(x.stdout).unwrap().lines().count()) / 2, 1)
+        String::from_utf8(x.stdout).unwrap().lines().count()
     };
 }
 

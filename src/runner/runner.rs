@@ -2,6 +2,7 @@ use crate::types::config::{JudgeConfig, TestCase};
 use crate::types::response::Response;
 use crate::types::result::{JudgeResult, JudgeStatus, SpjJudgeResult};
 use std::sync::{mpsc, Arc};
+use crate::types::config;
 
 
 fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeResult {
@@ -115,21 +116,29 @@ fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeRes
 
 pub fn run(config: JudgeConfig) -> Result<Response, Response> {
     let config = Arc::new(config);
-    let (tx, rx) = mpsc::sync_channel(*crate::types::config::CPU_CORES_COUNT);
+
+    let (mtx, mrx) = mpsc::sync_channel(*config::CPU_CORES_COUNT);
+    let (tx, rx) = mpsc::channel();
     for i in 0..config.test_cases.len() {
         let conf = config.clone();
-        let atx = mpsc::SyncSender::clone(&tx);
-        std::thread::spawn(move || atx.send(run_one_test_case(conf.clone(), &conf.test_cases[i])));
+        let _tx = mpsc::Sender::clone(&tx);
+        let _mtx = mpsc::SyncSender::clone(&mtx);
+        std::thread::spawn(move || {
+            _mtx.send(0).expect("sync_channel sender error");
+            _tx.send(run_one_test_case(conf.clone(), &conf.test_cases[i])).expect("channel sender error");
+        });
     }
     let mut response = Response::default();
     response.case_count = config.test_cases.len() as u16;
     let mut count = 0usize;
+
     while count < config.test_cases.len() {
         let res = rx
             .recv()
             .unwrap_or(JudgeResult::system_error_result(format!("系统错误")));
         count += 1;
-        response.results.push(res)
+        response.results.push(res);
+        mrx.recv().unwrap_or(0);
     }
 
     // 总和答案,
