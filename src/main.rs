@@ -42,7 +42,7 @@ async fn judge(
         Some(c) => c,
     };
 
-    let temp_dir = tempfile::tempdir()
+    let temp_dir = tempfile::tempdir_in(types::config::TMP_DIR_PATH.as_path())
         .map_err(|err| system_error_response(format!("新建临时文件夹错误 : {}", err)))?;
     let exe_dir = temp_dir.path().to_path_buf();
     // let exe_dir = std::path::PathBuf::from("/home/hzcool/Code/Rust/rust-judger/src/tmp");
@@ -96,7 +96,7 @@ async fn judge(
                 return Err(bad_request_response(format!(
                     "不支特特判语言 `{}` ",
                     spj_config.spj_lang,
-                )))
+                )));
             }
             Some(c) => c,
         };
@@ -170,6 +170,8 @@ async fn main() -> std::io::Result<()> {
     });
     let addr = std::env::var("ADDR").expect("can't find ADDR !!!");
 
+    println!("可并发任务数量 : {}", *crate::types::config::CPU_CORES_COUNT);
+
     let server = HttpServer::new(move || {
         App::new()
             .app_data(app_data.clone())
@@ -193,8 +195,8 @@ async fn main() -> std::io::Result<()> {
                     .service(judge),
             )
     })
-    .bind(addr.as_str())?
-    .run();
+        .bind(addr.as_str())?
+        .run();
     println!("服务器已启动 , addr : {}", addr);
     server.await
 }

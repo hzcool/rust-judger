@@ -10,6 +10,14 @@ lazy_static! {
         PathBuf::from(std::env::var("BASE_PATH").expect("缺少环境变量 : `BASE_PATH` !!!"));
     pub static ref RUNNER_PATH: PathBuf =
         PathBuf::from(std::env::var("BASE_PATH").unwrap()).join("src/cpp_runner/runner");
+    pub static ref TMP_DIR_PATH: PathBuf =
+        PathBuf::from(std::env::var("BASE_PATH").unwrap()).join("src/tmp");
+    pub static ref TEST_CASE_DIR: PathBuf =
+        PathBuf::from(std::env::var("TEST_CASE_DIR").expect("缺少环境变量 : `TEST_CASE_DIR` !!!"));
+    pub static ref CPU_CORES_COUNT: usize = {
+        let x = std::process::Command::new("grep").args(["core id", "/proc/cpuinfo"]).output().expect("获取 CPU 核心数失败!!!");
+        std::cmp::max((String::from_utf8(x.stdout).unwrap().lines().count()) / 2, 1)
+    };
 }
 
 use crate::checker::checker::Checker;
@@ -167,7 +175,7 @@ const SPJ_C: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_main.c",
     exe_name: "spj_main",
     compile_command:
-        "/usr/bin/gcc -std=c11 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
+    "/usr/bin/gcc -std=c11 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
     run_command: "{spj_exe_path}",
     //每个特判指令对每个样例需要接三个参数 -i {input_path} -o {output_path} -p {process_output_path}
 };
@@ -176,7 +184,7 @@ const SPJ_CPP: SpjCompileConfig = SpjCompileConfig {
     src_name: "spj_main.cpp",
     exe_name: "spj_main",
     compile_command:
-        "/usr/bin/g++ -std=c++17 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
+    "/usr/bin/g++ -std=c++17 -O2 -lm -w -fmax-errors=3 {spj_src_path} -o {spj_exe_path}",
     run_command: "{spj_exe_path}",
     //每个特判指令对每个样例需要接三个参数 -i {input_path} -o {output_path} -p {process_output_path}
 };

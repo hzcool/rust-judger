@@ -98,7 +98,7 @@ void Runner::run() {
         std::thread monitor([](pid_t child, int sec) {
            sleep(sec);
            kill(child, SIGXCPU); 
-        }, pid, max_cpu_time / 1000 + 1);
+        }, pid, max_cpu_time / 1000 + 10);
         monitor.detach();
         int status;
         struct rusage resource_usage;

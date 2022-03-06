@@ -17,7 +17,7 @@
 + ping  
   url ```http://127.0.0.1:8080/ping```  
   method ```POST```  
-  head ```"content-type", "application/json"```  
+  head ```[{"content-type", "application/json"}, {"ACCESS_TOKEN", "123456"}]```  
   data: ```空```
 
 返回结果:
@@ -42,7 +42,7 @@
 + judge  
   url ```http://127.0.0.1:8080/judge```  
   method ```POST```  
-  head ```"content-type", "application/json"```  
+  head ```[{"content-type", "application/json"}, {"ACCESS_TOKEN", "123456"}]```  
   data: ```json``` 格式
     ```yaml
   lang :  待测评的文件使用的编程语言 #可选项["C99", "C"(默认C11), "C11", "C++"(默认C++11), "C++11", "C++14", "C++17", Python2, Python3, Java]
