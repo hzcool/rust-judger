@@ -78,6 +78,8 @@ pub struct JudgeConfig {
     pub resource_rule: Option<i8>, // 资源限制规则
 
     pub run_command: Option<String>, //生成的运行规则
+
+    pub test_all: Option<bool>,
 }
 
 // const RUN_CMD_FMT: &str = "{} -c \"{}\" -t {} -m {} -o {} -I {} -O {} -r {}";

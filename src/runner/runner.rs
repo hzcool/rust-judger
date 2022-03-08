@@ -114,7 +114,8 @@ fn run_one_test_case(config: Arc<JudgeConfig>, test_case: &TestCase) -> JudgeRes
     }
 }
 
-pub fn run(config: JudgeConfig) -> Result<Response, Response> {
+
+fn run_by_concurrent(config: JudgeConfig) -> Result<Response, Response> {
     let config = Arc::new(config);
 
     let (mtx, mrx) = mpsc::sync_channel(*config::CPU_CORES_COUNT);
@@ -162,4 +163,36 @@ pub fn run(config: JudgeConfig) -> Result<Response, Response> {
         response.total_time += item.cpu_time
     }
     Ok(response)
+}
+
+fn run_by_sequence(config: JudgeConfig) -> Result<Response, Response> {
+    let config = Arc::new(config);
+    let mut response = Response::default();
+    response.case_count = config.test_cases.len() as u16;
+    for i in 0..config.test_cases.len() {
+        let res = run_one_test_case(config.clone(), &config.test_cases[i]);
+        if res.cpu_time > response.time {
+            response.time = res.cpu_time
+        }
+        if res.memory > response.memory {
+            response.memory = res.memory
+        }
+        response.total_time += res.cpu_time;
+        if let JudgeStatus::Accepted = res.status {
+            response.pass_count += 1;
+            response.results.push(res);
+        } else {
+            response.status = res.status;
+            response.results.push(res);
+            break;
+        }
+    }
+    Ok(response)
+}
+
+pub fn run(config: JudgeConfig) -> Result<Response, Response> {
+    match config.test_all.unwrap_or(true) {
+        true => run_by_concurrent(config),
+        _ => run_by_sequence(config),
+    }
 }
