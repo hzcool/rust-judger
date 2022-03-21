@@ -1,5 +1,6 @@
 //忽略空行和末尾空白字符
-use super::checker::CheckResult;
+use super::checker::{line_show, CheckResult};
+
 use crate::types::result::JudgeStatus;
 use crate::utils;
 use std::str::Lines;
@@ -48,7 +49,9 @@ pub fn standard_checker(std_output: &str, process_output: &str) -> CheckResult {
                 JudgeStatus::WrongAnswer,
                 format!(
                     "different at {}th line, expected `{}`, but found `{}`",
-                    line_count, suffix_trimed_std_line, suffix_trimed_process_line
+                    line_count,
+                    line_show(suffix_trimed_std_line),
+                    line_show(suffix_trimed_process_line)
                 ),
             );
         }

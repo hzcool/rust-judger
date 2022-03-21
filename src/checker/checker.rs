@@ -3,6 +3,14 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 pub type CheckResult = (JudgeStatus, String);
 
+const MAX_LINE_CHARS_SHOW: usize = 128;
+pub fn line_show(line: &str) -> String {
+    match line.len() < MAX_LINE_CHARS_SHOW {
+        true => line.to_string(),
+        false => format!("{}...", &line[0..MAX_LINE_CHARS_SHOW]),
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Checker {
     typ: String,
@@ -41,7 +49,7 @@ impl Checker {
             }
 
             "identical" => super::identical::check(std_output_path, process_output_path),
-            "unordered" => super::identical::check(std_output_path, process_output_path),
+            "unordered" => super::unordered::check(std_output_path, process_output_path),
             _ => (
                 JudgeStatus::SystemError,
                 format!("没有类型为 `{}` 的 checker", self.typ),

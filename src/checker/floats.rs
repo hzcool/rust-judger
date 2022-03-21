@@ -3,7 +3,7 @@
     2. 所有的数字满足浮点精度 epsilon 的要求
     3. 非数字要一致
 */
-use super::checker::CheckResult;
+use super::checker::{line_show, CheckResult};
 use super::standard::get_std_and_process_output;
 use crate::types::result::JudgeStatus;
 
@@ -48,8 +48,8 @@ fn floats_check(std_output: &str, process_output: &str, mode: i32, epsilon: f64)
                     format!(
                         "different at the {}th word, expected `{}`, but found `{}`",
                         i + 1,
-                        std_words[i],
-                        process_words[i]
+                        line_show(std_words[i]),
+                        line_show(process_words[i])
                     ),
                 );
             }

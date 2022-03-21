@@ -1,6 +1,6 @@
 // 忽略行末尾空格和结尾空行
 
-use super::checker::CheckResult;
+use super::checker::{line_show, CheckResult};
 use super::standard::get_std_and_process_output;
 use crate::types::result::JudgeStatus;
 
@@ -22,7 +22,9 @@ fn identical_check(std_output: &str, process_output: &str) -> CheckResult {
                 JudgeStatus::WrongAnswer,
                 format!(
                     "different at {}th line, expected `{}`, but found `{}` ",
-                    line_count, suffix_trimed_std_line, suffix_trimed_process_line
+                    line_count,
+                    line_show(suffix_trimed_std_line),
+                    line_show(suffix_trimed_process_line)
                 ),
             );
         }

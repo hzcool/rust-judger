@@ -1,6 +1,6 @@
 // 忽略所有的空格
 
-use super::checker::CheckResult;
+use super::checker::{line_show, CheckResult};
 use super::standard::get_std_and_process_output;
 use crate::types::result::JudgeStatus;
 
@@ -20,8 +20,8 @@ fn ignore_whitespaces_check(std_output: &str, process_output: &str) -> CheckResu
                 format!(
                     "different at the {}th word, expected `{}`, but found `{}`",
                     i + 1,
-                    std_words[i],
-                    process_words[i]
+                    line_show(std_words[i]),
+                    line_show(process_words[i])
                 ),
             );
         }
